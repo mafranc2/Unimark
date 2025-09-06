@@ -1,91 +1,73 @@
-/* Global Styles */
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background-color: #f4f4f9;
-  color: #333;
-  line-height: 1.6;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Unimark - Stay updated with the latest stock market news and insights.">
+  <title>Unimark - Stock Market News</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <!-- Hero Banner -->
+    <div class="hero">
+      <img src="stock-chart.png" alt="Stock market chart with green and red lines">
+      <div class="hero-text">
+        <h1>Unimark</h1>
+        <p>Your daily source for stock market news and insights</p>
+      </div>
+    </div>
 
-header {
-  background: #004080;
-  color: #fff;
-  padding: 20px;
-  text-align: center;
-}
+    <!-- Navigation Menu -->
+    <nav>
+      <ul>
+        <li><a href="index.html" aria-current="page">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li>My Classes
+          <ul>
+            <li><a href="https://class.daytonastate.edu/d2l/home/487729" target="_blank">Class 1</a></li>
+            <li><a href="https://class.daytonastate.edu/d2l/home/487730" target="_blank">Class 2</a></li>
+          </ul>
+        </li>
+        <li>My Assignments
+          <ul>
+            <li><a href="https://class.daytonastate.edu/d2l/lms/dropbox/user/folder_submit_files.d2l?db=1405223&grpid=0&isprv=0&bp=0&ou=487729" target="_blank">Assignment 1</a></li>
+            <li><a href="https://class.daytonastate.edu/d2l/lms/dropbox/user/folder_submit_files.d2l?db=1405224&grpid=0&isprv=0&bp=0&ou=487729" target="_blank">Assignment 2</a></li>
+          </ul>
+        </li>
+        <li>My Favorite Sites
+          <ul>
+            <li><a href="https://www.cnn.com/markets" target="_blank">CNN Markets</a></li>
+          </ul>
+        </li>
+        <li>Market Resources
+          <ul>
+            <li><a href="https://www.marketwatch.com/" target="_blank">MarketWatch</a></li>
+            <li><a href="https://finance.yahoo.com/" target="_blank">Yahoo Finance</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </header>
 
-header h1 {
-  margin: 0;
-}
+  <main>
+    <section aria-labelledby="news-heading">
+      <h2 id="news-heading">Today’s Market News</h2>
 
-nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0;
-}
+      <article>
+        <h3>📈 Stocks Rally Amid Economic Data</h3>
+        <p>Markets opened higher today as investors reacted positively to new economic growth reports. Analysts expect tech stocks to continue leading gains.</p>
+      </article>
 
-nav ul li {
-  display: inline-block;
-  margin: 0 15px;
-  position: relative;
-}
+      <article>
+        <h3>🏦 Federal Reserve Comments</h3>
+        <p>The Fed signaled it may hold interest rates steady, easing investor concerns about borrowing costs and inflationary pressures.</p>
+      </article>
+    </section>
+  </main>
 
-nav ul li ul {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: #fff;
-  border: 1px solid #ddd;
-  padding: 10px;
-  min-width: 150px;
-  z-index: 10;
-}
-
-nav ul li:hover ul {
-  display: block;
-}
-
-nav a {
-  color: #fff;
-  text-decoration: none;
-}
-
-nav li ul a {
-  color: #004080;
-}
-
-main {
-  padding: 20px;
-  max-width: 900px;
-  margin: auto;
-}
-
-h1, h2, h3 {
-  color: #004080;
-}
-
-figure {
-  margin: 20px 0;
-  text-align: center;
-}
-
-figure img {
-  max-width: 100%;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-}
-
-figcaption {
-  font-size: 0.9em;
-  color: #555;
-  margin-top: 5px;
-}
-
-footer {
-  text-align: center;
-  padding: 15px;
-  background: #222;
-  color: #eee;
-  margin-top: 30px;
-}
+  <footer>
+    <p>&copy; 2025 Unimark. All Rights Reserved.</p>
+  </footer>
+</body>
+</html>
