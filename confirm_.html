@@ -1,0 +1,34 @@
+
+# Recreate confirm.html
+confirm_html = '''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm Your Information</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        window.onload = function() {
+            const data = JSON.parse(localStorage.getItem("formData"));
+            if (!data) return;
+            document.getElementById("info").innerHTML = `
+                <p><strong>Name:</strong> ${data.firstname} ${data.lastname}</p>
+                <p><strong>Address:</strong> ${data.address}, ${data.city}, ${data.state}, ${data.zip}</p>
+                <p><strong>Phone:</strong> ${data.phone}</p>
+                <p><strong>Email:</strong> ${data.email}</p>
+                <p><strong>Birthdate:</strong> ${data.birthdate}</p>
+                <p><strong>Message:</strong> ${data.message}</p>
+            `;
+            document.getElementById("mailtoLink").href = `mailto:miguel_franco_denis@daytonastate.edu?subject=Form Submission&body=${encodeURIComponent(JSON.stringify(data, null, 2))}`;
+        }
+    </script>
+</head>
+<body>
+    <main>
+        <h1>Confirm Your Information</h1>
+        <div id="info"></div>
+        <a id="mailtoLink"><button>Send Email</button></a>
+    </main>
+</body>
+</html>
+'''
