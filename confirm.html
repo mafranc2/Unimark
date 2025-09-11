@@ -17,12 +17,10 @@
     <div class="card">
       <h1>Thank you <span id="name"></span>!</h1>
       <p>Your information was sent successfully. We'll be in touch shortly.</p>
-      <p><strong>What happens now?</strong> A confirmation email was sent to the site owner. If you left your email, they may follow up directly.</p>
       <a class="btn" href="index.html">Back to Home</a>
     </div>
   </main>
   <script>
-    // personalize if we stored the first name
     const n = sessionStorage.getItem('unimark:firstName');
     if(n){ document.getElementById('name').textContent = n; }
   </script>
