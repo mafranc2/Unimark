@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Form – Unimark</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Minimal safe styles if style.css isn't loaded */
+    :root{--ink:#0f172a;--sub:#475569;--accent:#0ea5e9;--bg:#f8fafc}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:var(--ink)}
+    main{max-width:900px;margin:0 auto;padding:24px}
+    h1{margin:16px 0 8px}
+    form{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .col-6{grid-column:span 6}
+    .col-12{grid-column:span 12}
+    label{display:block;font-weight:600;margin:4px 0}
+    input,select,textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px}
+    textarea{min-height:120px}
+    .actions{display:flex;gap:12px;align-items:center;margin-top:8px}
+    .btn{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .help{color:var(--sub);font-size:.9rem}
+    .error{color:#b91c1c}
+    .hidden{position:absolute!important;left:-10000px!important}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>User Information Form</h1>
+    <p class="help">Fill out the form below. You'll be redirected to a confirmation page after successful submission.</p>
+
+    <!--
+      IMPORTANT:
+      1) Replace YOUR_FORM_ID with your Formspree form ID.
+      2) In Formspree dashboard, set the target email where you want to receive notifications.
+    -->
+    <form id="unimark-form" method="POST" novalidate>
+      <div class="grid">
+        <div class="col-6">
+          <label for="firstName">First Name</label>
+          <input id="firstName" name="firstName" type="text" autocomplete="given-name" required />
+        </div>
+        <div class="col-6">
+          <label for="lastName">Last Name</label>
+          <input id="lastName" name="lastName" type="text" autocomplete="family-name" required />
+        </div>
+
+        <div class="col-12">
+          <label for="address">Address</label>
+          <input id="address" name="address" type="text" autocomplete="street-address" required />
+        </div>
+        <div class="col-6">
+          <label for="city">City</label>
+          <input id="city" name="city" type="text" autocomplete="address-level2" required />
+        </div>
+        <div class="col-3">
+          <label for="state">State</label>
+          <input id="state" name="state" type="text" minlength="2" maxlength="2" placeholder="FL" required />
+        </div>
+        <div class="col-3">
+          <label for="zip">Zip Code</label>
+          <input id="zip" name="zip" type="text" inputmode="numeric" pattern="\d{5}(-\d{4})?" placeholder="32771" required />
+        </div>
+
+        <div class="col-6">
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" type="tel" placeholder="(555) 555-5555" />
+        </div>
+        <div class="col-6">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required />
+        </div>
+
+        <div class="col-6">
+          <label for="birthdate">Birthdate</label>
+          <input id="birthdate" name="birthdate" type="date" />
+        </div>
+
+        <div class="col-12">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" required></textarea>
+        </div>
+
+        <!-- Simple spam check (visible) -->
+        <div class="col-6">
+          <label for="human">What is 3 + 4?</label>
+          <input id="human" name="human" type="number" inputmode="numeric" required />
+        </div>
+
+        <!-- Honeypot (hidden to users; catches bots) -->
+        <div class="hidden" aria-hidden="true">
+          <label for="company">Company</label>
+          <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <div class="col-12 actions">
+          <button id="submitBtn" class="btn" type="submit">Submit</button>
+          <span id="status" class="help" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+    </form>
+
+    <p class="help" style="margin-top:16px">Having trouble? Email us directly: <a href="mailto:you@example.com">you@example.com</a></p>
+  </main>
+
+  <script>
+    (function(){
+      const form = document.getElementById('unimark-form');
+      const statusEl = document.getElementById('status');
+      const btn = document.getElementById('submitBtn');
+      const FORMSPREE_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID'; // ← replace
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Basic checks
+        statusEl.textContent = '';
+        if (form.company.value) { // honeypot filled => likely bot
+          statusEl.textContent = 'Submission blocked.';
+          return;
+        }
+        if (parseInt(form.human.value, 10) !== 7) {
+          statusEl.textContent = 'Please answer the math question correctly.';
+          form.human.focus();
+          return;
+        }
+        if (!form.reportValidity()) return;
+
+        btn.disabled = true;
+        statusEl.textContent = 'Sending…';
+
+        try {
+          const resp = await fetch(FORMSPREE_ENDPOINT, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { 'Accept': 'application/json' }
+          });
+
+          if (resp.ok) {
+            // Optional: store first name for the thank-you page
+            sessionStorage.setItem('unimark:firstName', form.firstName.value || '');
+            window.location.href = 'confirm.html';
+          } else {
+            const data = await resp.json().catch(()=>({}));
+            throw new Error((data && data.error) || 'Submission failed.');
+          }
+        } catch (err) {
+          console.error(err);
+          statusEl.textContent = 'Oops! There was a problem submitting the form.';
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

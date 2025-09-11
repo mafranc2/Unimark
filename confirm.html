@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thank You – Unimark</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#f8fafc;color:#0f172a}
+    main{max-width:800px;margin:0 auto;padding:32px}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px}
+    a.btn{display:inline-block;margin-top:16px;background:#0ea5e9;color:#fff;padding:10px 14px;border-radius:8px;text-decoration:none}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="card">
+      <h1>Thank you <span id="name"></span>!</h1>
+      <p>Your information was sent successfully. We'll be in touch shortly.</p>
+      <p><strong>What happens now?</strong> A confirmation email was sent to the site owner. If you left your email, they may follow up directly.</p>
+      <a class="btn" href="index.html">Back to Home</a>
+    </div>
+  </main>
+  <script>
+    // personalize if we stored the first name
+    const n = sessionStorage.getItem('unimark:firstName');
+    if(n){ document.getElementById('name').textContent = n; }
+  </script>
+</body>
+</html>
