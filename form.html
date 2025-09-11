@@ -1,70 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>User Information Form</title>
-    <link rel="stylesheet" href="style.css">
-    <script>
-        function validateForm() {
-            const firstName = document.forms["userForm"]["firstname"].value.trim();
-            const lastName = document.forms["userForm"]["lastname"].value.trim();
-            const address = document.forms["userForm"]["address"].value.trim();
-            const city = document.forms["userForm"]["city"].value.trim();
-            const state = document.forms["userForm"]["state"].value.trim();
-            const zip = document.forms["userForm"]["zip"].value.trim();
-            const phone = document.forms["userForm"]["phone"].value.trim();
-            const email = document.forms["userForm"]["email"].value.trim();
-            const birthdate = document.forms["userForm"]["birthdate"].value;
-            const message = document.forms["userForm"]["message"].value.trim();
-            const confirm = document.forms["userForm"]["confirm"].value.trim();
+  <meta charset="UTF-8">
+  <title>User Information Form</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    main { max-width: 900px; margin: 0 auto; padding: 24px; font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+    label { display:block; margin:8px 0 4px; font-weight:600; }
+    input, textarea { width:100%; max-width:560px; padding:10px; border:1px solid #cbd5e1; border-radius:8px; }
+    textarea { min-height:120px; }
+    .row { margin-bottom:12px; }
+    .actions { margin-top:16px; }
+    .btn { background:#0ea5e9; color:#fff; border:0; padding:10px 14px; border-radius:8px; cursor:pointer; }
+    .help { color:#475569; font-size:.9rem; margin-left:8px; }
+  </style>
+  <script>
+    async function validateForm(e) {
+      e.preventDefault();
+      const form = document.forms["userForm"];
+      const firstName = form["firstname"].value.trim();
+      const lastName  = form["lastname"].value.trim();
+      const address   = form["address"].value.trim();
+      const city      = form["city"].value.trim();
+      const state     = form["state"].value.trim();
+      const zip       = form["zip"].value.trim();
+      const phone     = form["phone"].value.trim();
+      const email     = form["_replyto"].value.trim();
+      const birthdate = form["birthdate"].value;
+      const message   = form["message"].value.trim();
+      const humanAnswer = form["confirm"].value.trim();
 
-            const phonePattern = /^\(\d{3}\)\d{3}-\d{4}$/;
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const today = new Date();
-            const birth = new Date(birthdate);
+      const phonePattern = /^\(\d{3}\)\d{3}-\d{4}$/;
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const today = new Date();
+      const birth = new Date(birthdate);
 
-            if (!firstName || !lastName || !address || !city || !state || !zip || !phone || !email || !birthdate || !message || !confirm) {
-                alert("All fields must be filled out.");
-                return false;
-            }
-            if (!phonePattern.test(phone)) {
-                alert("Phone number must be in the format (000)000-0000.");
-                return false;
-            }
-            if (!emailPattern.test(email)) {
-                alert("Invalid email format.");
-                return false;
-            }
-            if (birth > today) {
-                alert("Birthdate cannot be in the future.");
-                return false;
-            }
-            localStorage.setItem("formData", JSON.stringify({
-                firstname, lastname, address, city, state, zip, phone, email, birthdate, message, confirm
-            }));
-            window.location.href = "confirm.html";
-            return false;
+      if (!firstName || !lastName || !address || !city || !state || !zip || !phone || !email || !birthdate || !message || !humanAnswer) {
+        alert("All fields must be filled out.");
+        return false;
+      }
+      if (!phonePattern.test(phone)) {
+        alert("Phone number must be in the format (000)000-0000.");
+        return false;
+      }
+      if (!emailPattern.test(email)) {
+        alert("Invalid email format.");
+        return false;
+      }
+      if (birth > today) {
+        alert("Birthdate cannot be in the future.");
+        return false;
+      }
+      if (parseInt(humanAnswer, 10) !== 7) {
+        alert("Please answer the math question correctly.");
+        return false;
+      }
+
+      localStorage.setItem("formData", JSON.stringify({
+        firstname: firstName, lastname: lastName, address, city, state, zip, phone, email, birthdate, message, confirm: humanAnswer
+      }));
+
+      const submitBtn = document.getElementById('submitBtn');
+      const statusEl = document.getElementById('status');
+      submitBtn.disabled = true;
+      statusEl.textContent = "Sending…";
+
+      try {
+        const resp = await fetch('https://formspree.io/f/xrbajndp', {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+        if (resp.ok) {
+          window.location.href = "confirm.html";
+        } else {
+          statusEl.textContent = "Oops! There was a problem submitting the form.";
         }
-    </script>
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Network error. Please try again.";
+      } finally {
+        submitBtn.disabled = false;
+      }
+      return false;
+    }
+  </script>
 </head>
 <body>
-    <main>
-        <h1>User Information Form</h1>
-        <form name="userForm" onsubmit="return validateForm()">
-            <label>First Name: <input type="text" name="firstname"></label><br>
-            <label>Last Name: <input type="text" name="lastname"></label><br>
-            <label>Address: <input type="text" name="address"></label><br>
-            <label>City: <input type="text" name="city"></label><br>
-            <label>State: <input type="text" name="state"></label><br>
-            <label>Zip Code: <input type="text" name="zip"></label><br>
-            <label>Phone: <input type="text" name="phone" placeholder="(000)000-0000"></label><br>
-            <label>Email: <input type="email" name="email"></label><br>
-            <label>Birthdate: <input type="date" name="birthdate"></label><br>
-            <label>Message:<br><textarea name="message" rows="4" cols="50"></textarea></label><br>
-            <label>What is 3 + 4? <input type="text" name="confirm"></label><br>
-            <input type="submit" value="Submit">
-        </form>
-    </main>
+  <main>
+    <h1>User Information Form</h1>
+    <form name="userForm" onsubmit="return validateForm(event)" novalidate>
+      <input type="hidden" name="_subject" value="Unimark: New form submission">
+
+      <div class="row">
+        <label>First Name:
+          <input type="text" name="firstname" autocomplete="given-name" required>
+        </label>
+      </div>
+
+      <div class="row">
+        <label>Last Name:
+          <input type="text" name="lastname" autocomplete="family-name" required>
+        </label>
+      </div>
+
+      <div class="row">
+        <label>Address:
+          <input type="text" name="address" autocomplete="street-address" required>
+        </label>
+      </div>
+
+      <div class="row">
+        <label>City:
+          <input type="text" name="city" required>
+        </label>
+      </div>
+
+      <div class="row">
+        <label>State:
+          <input type="text" name="state" minlength="2" maxlength="2" placeholder="FL" required>
+        </label>
+      </div>
+
+      <div class="row">
+        <label>Zip Code:
+          <input type="text" name="zip" inputmode="numeric" pattern="\d{5}(-\d{4})?" placeholder="32771" required>
+        </label>
+      </div>
+
+      <div class="row">
+        <label>Phone <span class="help">(format: (000)000-0000)</span>:
+          <input type="text" name="phone" placeholder="(000)000-0000" required>
+        </label>
+      </div>
+
+      <div class="row">
+        <label>Email:
+          <input type="email" name="_replyto" autocomplete="email" required>
+        </label>
+      </div>
+
+      <div class="row">
+        <label>Birthdate:
+          <input type="date" name="birthdate" required>
+        </label>
+      </div>
+
+      <div class="row">
+        <label>Message:
+          <textarea name="message" rows="4" cols="50" required></textarea>
+        </label>
+      </div>
+
+      <div class="row">
+        <label>What is 3 + 4?
+          <input type="text" name="confirm" required>
+        </label>
+      </div>
+
+      <div class="actions">
+        <input id="submitBtn" class="btn" type="submit" value="Submit">
+        <span id="status" class="help" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+  </main>
 </body>
 </html>
-'''
