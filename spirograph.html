@@ -57,7 +57,7 @@
   <main>
     <div class="controls">
       <label for="R">R:</label>
-      <input type="number" id="R" value="80" min="10" max="200">
+      <input type="number" id="R" value="100" min="10" max="250">
 
       <label for="r">r:</label>
       <input type="number" id="r" value="30" min="5" max="100">
@@ -76,42 +76,8 @@
     const ctx = canvas.getContext("2d");
 
     function startSpirograph() {
-      // Reset canvas
+      // Reset and clear
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const R = parseInt(document.getElementById("R").value);
-      const r = parseInt(document.getElementById("r").value);
-      const O = parseInt(document.getElementById("O").value);
-
-      // Validate ranges
-      if (R < 10 || R > 200 || r < 5 || r > 100 || O < 5 || O > 100) {
-        alert("Please enter values within the allowed ranges.");
-        return;
-      }
-
-      let t = 0;
-      ctx.strokeStyle = "blue";
-      ctx.beginPath();
-
-      function drawStep() {
-        const x = (R + r) * Math.cos(t) - (r + O) * Math.cos(((R + r) / r) * t);
-        const y = (R + r) * Math.sin(t) - (r + O) * Math.sin(((R + r) / r) * t);
-
-        if (t === 0) {
-          ctx.moveTo(canvas.width / 2 + x, canvas.height / 2 + y);
-        } else {
-          ctx.lineTo(canvas.width / 2 + x, canvas.height / 2 + y);
-        }
-
-        t += 0.01;
-
-        if (t < Math.PI * 20) {
-          requestAnimationFrame(drawStep);
-        } else {
-          ctx.stroke();
-        }
-      }
-
-      drawStep();
-    }
