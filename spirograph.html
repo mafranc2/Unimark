@@ -76,7 +76,8 @@
     const ctx = canvas.getContext("2d");
 
     function startSpirograph() {
-      // Clear previous drawing
+      // Reset canvas
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const R = parseInt(document.getElementById("R").value);
@@ -90,32 +91,27 @@
       }
 
       let t = 0;
-      ctx.beginPath();
       ctx.strokeStyle = "blue";
-      ctx.translate(canvas.width / 2, canvas.height / 2); // Move to center
+      ctx.beginPath();
 
       function drawStep() {
         const x = (R + r) * Math.cos(t) - (r + O) * Math.cos(((R + r) / r) * t);
         const y = (R + r) * Math.sin(t) - (r + O) * Math.sin(((R + r) / r) * t);
 
         if (t === 0) {
-          ctx.moveTo(x, y);
+          ctx.moveTo(canvas.width / 2 + x, canvas.height / 2 + y);
         } else {
-          ctx.lineTo(x, y);
+          ctx.lineTo(canvas.width / 2 + x, canvas.height / 2 + y);
         }
 
-        t += 0.01; // Step size (smaller = smoother)
+        t += 0.01;
 
-        if (t < Math.PI * 20) { // Limit how much we draw
+        if (t < Math.PI * 20) {
           requestAnimationFrame(drawStep);
         } else {
           ctx.stroke();
-          ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
         }
       }
 
       drawStep();
     }
-  </script>
-</body>
-</html>
