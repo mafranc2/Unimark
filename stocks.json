@@ -1,0 +1,46 @@
+{
+  "stocks": [
+    {
+      "company": "Apple Inc.",
+      "ticker": "AAPL",
+      "sector": "Technology",
+      "price": 178.52,
+      "change": -1.24
+    },
+    {
+      "company": "Microsoft Corporation",
+      "ticker": "MSFT",
+      "sector": "Technology",
+      "price": 334.65,
+      "change": 2.18
+    },
+    {
+      "company": "Tesla, Inc.",
+      "ticker": "TSLA",
+      "sector": "Automotive",
+      "price": 248.10,
+      "change": -3.45
+    },
+    {
+      "company": "JPMorgan Chase & Co.",
+      "ticker": "JPM",
+      "sector": "Financials",
+      "price": 151.34,
+      "change": 0.82
+    },
+    {
+      "company": "Amazon.com, Inc.",
+      "ticker": "AMZN",
+      "sector": "E-Commerce",
+      "price": 135.77,
+      "change": 1.55
+    },
+    {
+      "company": "Goldman Sachs Group",
+      "ticker": "GS",
+      "sector": "Financials",
+      "price": 318.22,
+      "change": -0.67
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Market Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; background-color: #f4f4f9; }
+    h1 { text-align: center; color: #333; }
+    .controls { text-align: center; margin-bottom: 20px; }
+    select { padding: 8px; font-size: 14px; }
+    table { width: 90%; margin: 0 auto; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
+    th { background: #222; color: white; }
+    tr:hover { background: #f1f1f1; }
+    .positive { color: green; font-weight: bold; }
+    .negative { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Stock Market Dashboard</h1>
+    <div class="controls">
+      <label for="sectorFilter">Filter by Sector: </label>
+      <select id="sectorFilter"><option value="All">All</option></select>
+    </div>
+  </header>
+
+  <main>
+    <table id="stocksTable">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Ticker</th>
+          <th>Sector</th>
+          <th>Price ($)</th>
+          <th>Daily Change</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Unimark. All Rights Reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
