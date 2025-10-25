@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bouncing Ball Animation</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    canvas {
+      border: 2px solid white;
+      background-color: #222;
+      display: block;
+      margin: 30px auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bouncing Ball Animation</h1>
+  <canvas id="myCanvas" width="600" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById("myCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Ball properties
+    let ball = {
+      x: 100,
+      y: 100,
+      radius: 20,
+      color: "skyblue",
+      dx: 3,  // horizontal speed
+      dy: 2   // vertical speed
+    };
+
+    // Draw ball
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = ball.color;
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    // Update ball position
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBall();
+
+      ball.x += ball.dx;
+      ball.y += ball.dy;
+
+      // Bounce off walls
+      if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+        ball.dx = -ball.dx;
+      }
+      if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+        ball.dy = -ball.dy;
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    // Mouse click event
+    canvas.addEventListener("click", function(event) {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+
+      // Check if the click is inside the ball
+      const distance = Math.sqrt((mouseX - ball.x)**2 + (mouseY - ball.y)**2);
+      if (distance < ball.radius) {
+        // Change color and reverse direction
+        ball.color = "#" + Math.floor(Math.random()*16777215).toString(16);
+        ball.dx = -ball.dx;
+        ball.dy = -ball.dy;
+      }
+    });
+
+    // Start animation
+    update();
+  </script>
+</body>
+</html>
