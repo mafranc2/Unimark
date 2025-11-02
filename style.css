@@ -1,4 +1,6 @@
-/* Global Styles */
+/* ===========================
+   Global Styles
+   =========================== */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -7,7 +9,9 @@ body {
   line-height: 1.6;
 }
 
-/* Hero Banner */
+/* ===========================
+   Hero Banner
+   =========================== */
 .hero {
   position: relative;
   width: 100%;
@@ -37,7 +41,9 @@ body {
   font-size: 2.5em;
 }
 
-/* Header */
+/* ===========================
+   Header & Navigation
+   =========================== */
 header {
   background: #004080;
   color: #fff;
@@ -69,6 +75,7 @@ nav ul li:hover {
   background-color: #003060;
 }
 
+/* Dropdown menus */
 nav ul li ul {
   position: absolute;
   top: 100%;
@@ -79,6 +86,7 @@ nav ul li ul {
   visibility: hidden;
   opacity: 0;
   transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 10;
 }
 
 nav ul li:hover ul {
@@ -101,7 +109,9 @@ nav ul li ul li a:hover {
   background-color: #f0f0f0;
 }
 
-/* Main Content */
+/* ===========================
+   Main Content
+   =========================== */
 main {
   padding: 20px;
   max-width: 900px;
@@ -129,11 +139,97 @@ figcaption {
   margin-top: 5px;
 }
 
-/* Footer */
+/* ===========================
+   Buttons
+   =========================== */
+.button {
+  background-color: #004080;
+  color: white;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+.button:hover {
+  background-color: #003060;
+}
+
+/* ===========================
+   Footer
+   =========================== */
 footer {
   text-align: center;
   padding: 15px;
   background: #222;
   color: #eee;
   margin-top: 30px;
+}
+
+/* ===========================
+   Responsive Mobile Styles
+   =========================== */
+
+/* Menu toggle hidden on large screens */
+.menu-toggle {
+  display: none;
+  font-size: 1.2rem;
+  color: #fff;
+  background: #004080;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+/* Mobile Layout */
+@media (max-width: 768px) {
+
+  /* Show menu button */
+  .menu-toggle {
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+
+  /* Hide nav links initially */
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    background-color: #004080;
+  }
+
+  /* Show when active */
+  .nav-links.active {
+    display: flex;
+  }
+
+  nav ul li {
+    display: block;
+    text-align: left;
+  }
+
+  nav ul li a {
+    padding: 12px 20px;
+  }
+
+  nav ul li ul {
+    position: static;
+    border: none;
+  }
+
+  nav ul li:hover ul {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .hero {
+    height: auto;
+  }
+
+  .hero img {
+    height: auto;
+  }
+
+  .hero-text h1 {
+    font-size: 1.8em;
+  }
 }
