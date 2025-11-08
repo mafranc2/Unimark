@@ -3,66 +3,144 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Class Advisor - Personalized student guidance and resources.">
-  <title>Class Advisor - Unimark</title>
+  <meta name="description" content="Interactive Class Advisor - BSIT Program">
+  <title>Class Advisor | Unimark</title>
   <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* --- Class Advisor Specific Styles --- */
+    .advisor-container {
+      max-width: 1000px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .advisor-section {
+      margin-bottom: 25px;
+    }
+
+    .courses-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .course-card {
+      background: #e6f0ff;
+      border: 1px solid #004080;
+      padding: 10px;
+      border-radius: 6px;
+      width: 160px;
+      text-align: center;
+      cursor: grab;
+      transition: transform 0.2s;
+    }
+
+    .course-card:hover {
+      transform: scale(1.05);
+      background-color: #d6e8ff;
+    }
+
+    .course-card.taken {
+      background-color: #c6f6c6;
+      border-color: #2e8b57;
+      cursor: not-allowed;
+    }
+
+    .course-card.eligible {
+      background-color: #fff9c4;
+      border-color: #d1a700;
+    }
+
+    .drop-zone {
+      border: 2px dashed #004080;
+      padding: 20px;
+      text-align: center;
+      background-color: #f9f9ff;
+      border-radius: 8px;
+      min-height: 120px;
+    }
+
+    .drop-zone.hover {
+      background-color: #e0e7ff;
+    }
+
+    .info-box {
+      background: #f0f8ff;
+      border-left: 4px solid #004080;
+      padding: 10px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .info-box.active {
+      display: block;
+    }
+
+    button {
+      background: #004080;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 15px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #003060;
+    }
+  </style>
 </head>
 
 <body>
   <header>
-    <!-- Hero Banner -->
     <div class="hero">
-      <img src="advisor-banner.jpg" alt="Advisor banner with students and charts">
+      <img src="stock-chart-png.jpg" alt="Stock market chart">
       <div class="hero-text">
-        <h1>Class Advisor</h1>
-        <p>Your personalized academic and career guidance hub</p>
+        <h1>Unimark Class Advisor</h1>
+        <p>Plan your BSIT courses and check prerequisites dynamically</p>
       </div>
     </div>
 
-    <!-- Navigation Menu -->
     <nav>
       <button class="menu-toggle" aria-label="Toggle menu">☰ Menu</button>
       <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
+        <li><a href="class-advisor.html" aria-current="page">Class Advisor</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="form.html">User Form</a></li>
-        <li><a href="calculator.html">Projectile Calculator</a></li>
-        <li><a href="spirograph.html">Spirograph</a></li>
-        <li><a href="stocks.html">Stocks</a></li>
-        <li><a href="cardgame.html">Card Game</a></li>
+        <li><a href="calculator.html">Calculator</a></li>
         <li><a href="animation.html">Animation</a></li>
-        <li><a href="class-advisor.html" aria-current="page">Class Advisor</a></li>
       </ul>
     </nav>
   </header>
 
   <main>
-    <section aria-labelledby="advisor-overview">
-      <h2 id="advisor-overview">📘 Meet Your Class Advisor</h2>
-      <p>
-        Welcome to the Class Advisor page! Here you’ll find links to your classes, assignments, and academic tools to help you stay on track throughout the semester.
-      </p>
-    </section>
+    <div class="advisor-container">
+      <h2>🎓 Interactive Class Advisor</h2>
+      <p>Drag completed courses into the box below. The system will automatically show which classes you can take next based on prerequisites (including OR requirements).</p>
 
-    <section aria-labelledby="advisor-links">
-      <h2 id="advisor-links">🎓 Quick Access</h2>
-      <ul>
-        <li><a href="https://class.daytonastate.edu/d2l/home/487729" target="_blank">Class 1: Web Development</a></li>
-        <li><a href="https://class.daytonastate.edu/d2l/home/487730" target="_blank">Class 2: Database Systems</a></li>
-        <li><a href="https://class.daytonastate.edu/d2l/home" target="_blank">Go to D2L Home</a></li>
-      </ul>
-    </section>
+      <div class="advisor-section">
+        <h3>Available Courses</h3>
+        <div id="availableCourses" class="courses-grid"></div>
+      </div>
 
-    <section aria-labelledby="advisor-tools">
-      <h2 id="advisor-tools">🛠 Academic Tools</h2>
-      <p>Here are some tools that can help you succeed:</p>
-      <ul>
-        <li><a href="calculator.html">Projectile Calculator</a></li>
-        <li><a href="spirograph.html">Spirograph Visualizer</a></li>
-        <li><a href="animation.html">Interactive Animation</a></li>
-      </ul>
-    </section>
+      <div class="advisor-section">
+        <h3>My Completed Courses</h3>
+        <div id="takenZone" class="drop-zone">Drop completed classes here</div>
+      </div>
+
+      <div class="advisor-section">
+        <h3>Eligible to Take Next</h3>
+        <div id="eligibleCourses" class="courses-grid"></div>
+      </div>
+
+      <div id="courseInfo" class="info-box"></div>
+      <button id="resetBtn">Reset</button>
+    </div>
   </main>
 
   <footer>
@@ -70,12 +148,117 @@
   </footer>
 
   <script>
+    // ===== JSON DATA STRUCTURE =====
+    const programData = [
+      { code: "COP1000", name: "Introduction to Programming", prereq: [], note: "Start here — no prerequisites." },
+      { code: "COP2000", name: "Programming Fundamentals", prereq: ["COP1000"], note: "Requires Intro to Programming." },
+      { code: "COP2800", name: "Java Programming", prereq: ["COP2000"], note: "Requires Programming Fundamentals." },
+      { code: "COP2830", name: "Web Programming", prereq: ["COP2000"], note: "Requires Programming Fundamentals." },
+      { code: "COP3002", name: "Advanced Java", prereq: [["COP2800", "COP2830"]], note: "Requires Java OR Web Programming." },
+      { code: "NET2100", name: "Networking Essentials", prereq: [], note: "Standalone networking course." },
+      { code: "MAT2050", name: "Discrete Mathematics", prereq: [], note: "Math requirement." },
+      { code: "CAPSTONE", name: "IT Capstone Project", prereq: [["COP3002", "NET2100"], "MAT2050"], note: "Requires Advanced Java OR Networking, AND Discrete Math." }
+    ];
+
+    const takenCourses = new Set();
+
+    const availableContainer = document.getElementById("availableCourses");
+    const takenZone = document.getElementById("takenZone");
+    const eligibleContainer = document.getElementById("eligibleCourses");
+    const infoBox = document.getElementById("courseInfo");
+    const resetBtn = document.getElementById("resetBtn");
+
+    // ===== Create course cards dynamically =====
+    function createCourseCard(course) {
+      const card = document.createElement("div");
+      card.className = "course-card";
+      card.draggable = true;
+      card.textContent = course.code;
+      card.dataset.code = course.code;
+      card.addEventListener("click", () => showInfo(course));
+      card.addEventListener("dragstart", dragStart);
+      return card;
+    }
+
+    // ===== Display course info =====
+    function showInfo(course) {
+      infoBox.innerHTML = `<strong>${course.code} - ${course.name}</strong><br>${course.note}`;
+      infoBox.classList.add("active");
+    }
+
+    // ===== Drag-and-drop logic =====
+    function dragStart(e) {
+      e.dataTransfer.setData("text/plain", e.target.dataset.code);
+    }
+
+    takenZone.addEventListener("dragover", e => {
+      e.preventDefault();
+      takenZone.classList.add("hover");
+    });
+
+    takenZone.addEventListener("dragleave", () => takenZone.classList.remove("hover"));
+
+    takenZone.addEventListener("drop", e => {
+      e.preventDefault();
+      takenZone.classList.remove("hover");
+      const code = e.dataTransfer.getData("text/plain");
+      takeCourse(code);
+    });
+
+    // ===== Handle taking a course =====
+    function takeCourse(code) {
+      if (takenCourses.has(code)) return;
+      takenCourses.add(code);
+      updateUI();
+    }
+
+    // ===== Determine eligibility =====
+    function canTake(course) {
+      return course.prereq.every(req => {
+        if (Array.isArray(req)) {
+          // OR prereqs: at least one must be taken
+          return req.some(r => takenCourses.has(r));
+        } else {
+          // Single prereq
+          return takenCourses.has(req);
+        }
+      });
+    }
+
+    // ===== Update interface =====
+    function updateUI() {
+      availableContainer.innerHTML = "";
+      eligibleContainer.innerHTML = "";
+
+      programData.forEach(course => {
+        const card = createCourseCard(course);
+
+        if (takenCourses.has(course.code)) {
+          card.classList.add("taken");
+          takenZone.appendChild(card);
+        } else if (canTake(course)) {
+          card.classList.add("eligible");
+          eligibleContainer.appendChild(card);
+        } else {
+          availableContainer.appendChild(card);
+        }
+      });
+    }
+
+    resetBtn.addEventListener("click", () => {
+      takenCourses.clear();
+      takenZone.innerHTML = "Drop completed classes here";
+      updateUI();
+      infoBox.classList.remove("active");
+    });
+
+    // ===== Initial render =====
+    updateUI();
+
+    // ===== Mobile Menu =====
     const menuToggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
-
-    menuToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('active');
-    });
+    menuToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
   </script>
 </body>
 </html>
