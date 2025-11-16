@@ -3,51 +3,149 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CMS Comparison Table</title>
+  <title>CMS Comparison - Unimark</title>
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Table Styling (lightweight and clean) */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 20px 0;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f0f0f0;
+      cursor: pointer;
+    }
+    tr:nth-child(even) {
+      background: #fafafa;
+    }
+    #searchBox {
+      padding: 8px;
+      width: 300px;
+      margin-bottom: 15px;
+    }
+    ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+  </style>
 </head>
+
 <body>
   <header>
-    <h1>Content Management Systems Comparison</h1>
-    <p>This page dynamically loads a JSON file and generates a table listing CMS systems, their capabilities, limitations, and example sites.</p>
+    <nav>
+      <button class="menu-toggle" aria-label="Toggle menu">☰ Menu</button>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="form.html">User Form</a></li>
+        <li><a href="calculator.html">Projectile Calculator</a></li>
+        <li><a href="spirograph.html">Spirograph</a></li>
+        <li><a href="stocks.html">Stocks</a></li>
+        <li><a href="cardgame.html">Card Game</a></li>
+        <li><a href="animation.html">Animation</a></li>
+        <li><a href="class-advisor.html">Class Advisor</a></li>
+        <li><strong><a href="cms.html" aria-current="page">CMS Table</a></strong></li>
+      </ul>
+    </nav>
   </header>
 
   <main>
-    <table id="cms-table">
+    <h1>Content Management Systems Comparison</h1>
+    <p>This table is dynamically generated using data from an external JSON file (<code>cms_data_json.json</code>). It demonstrates client-side scripting (JavaScript + DHTML) as required.</p>
+
+    <input type="text" id="searchBox" placeholder="Search CMS…">
+
+    <table id="cmsTable">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Support</th>
-          <th>Technology</th>
-          <th>Capabilities</th>
-          <th>Limitations</th>
-          <th>Example Site</th>
+          <th data-key="name">System</th>
+          <th data-key="support">Support</th>
+          <th data-key="technology">Technology</th>
+          <th data-key="capabilities">Major Capabilities</th>
+          <th data-key="limitations">Major Limitations</th>
+          <th data-key="example">Example Site</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </main>
 
+  <footer>
+    <p>&copy; 2025 Unimark. All Rights Reserved.</p>
+  </footer>
+
   <script>
-    fetch('cms-data.json')
+    /* Mobile Nav */
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    menuToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+
+    /* Load JSON CMS Data */
+    let cmsData = [];
+    let sortOrder = {}; 
+
+    fetch('cms_data_json.json')
       .then(response => response.json())
       .then(data => {
-        const tbody = document.querySelector('#cms-table tbody');
-        data.forEach(cms => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${cms.Name}</td>
-            <td>${cms.Support}</td>
-            <td>${cms.Technology}</td>
-            <td>${cms.Capabilities.join('<br>')}</td>
-            <td>${cms.Limitations.join('<br>')}</td>
-            <td><a href="${cms.Example}" target="_blank">${cms.Example}</a></td>
-          `;
-          tbody.appendChild(row);
-        });
+        cmsData = data;
+        renderTable(cmsData);
       })
-      .catch(error => console.error('Error loading CMS JSON:', error));
+      .catch(err => console.error("Error loading cms_data_json.json:", err));
+
+    /* Render Table */
+    function renderTable(data) {
+      const tbody = document.querySelector("#cmsTable tbody");
+      tbody.innerHTML = "";
+
+      data.forEach(item => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${item.name}</td>
+          <td>${item.support}</td>
+          <td>${item.technology}</td>
+          <td><ul>${item.capabilities.map(c => `<li>${c}</li>`).join("")}</ul></td>
+          <td><ul>${item.limitations.map(l => `<li>${l}</li>`).join("")}</ul></td>
+          <td><a href="${item.example}" target="_blank">${item.example}</a></td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* Search Filter */
+    document.getElementById("searchBox").addEventListener("input", function() {
+      const term = this.value.toLowerCase();
+      const filtered = cmsData.filter(item =>
+        JSON.stringify(item).toLowerCase().includes(term)
+      );
+      renderTable(filtered);
+    });
+
+    /* Sorting */
+    document.querySelectorAll("th[data-key]").forEach(th => {
+      th.addEventListener("click", () => {
+        const key = th.getAttribute("data-key");
+        sortOrder[key] = !sortOrder[key];
+
+        const sorted = [...cmsData].sort((a, b) => {
+          let v1 = JSON.stringify(a[key]).toLowerCase();
+          let v2 = JSON.stringify(b[key]).toLowerCase();
+          return sortOrder[key] ? v1.localeCompare(v2) : v2.localeCompare(v1);
+        });
+
+        renderTable(sorted);
+      });
+    });
   </script>
+
 </body>
 </html>
-
