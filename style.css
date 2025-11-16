@@ -50,7 +50,6 @@ header {
   text-align: center;
 }
 
-/* Navigation */
 nav ul {
   list-style: none;
   padding: 0;
@@ -75,7 +74,6 @@ nav ul li:hover {
   background-color: #003060;
 }
 
-/* Dropdown menus */
 nav ul li ul {
   position: absolute;
   top: 100%;
@@ -94,15 +92,9 @@ nav ul li:hover ul {
   opacity: 1;
 }
 
-nav ul li ul li {
-  display: block;
-}
-
 nav ul li ul li a {
   padding: 10px 15px;
   color: #004080;
-  text-decoration: none;
-  display: block;
 }
 
 nav ul li ul li a:hover {
@@ -114,7 +106,7 @@ nav ul li ul li a:hover {
    =========================== */
 main {
   padding: 20px;
-  max-width: 900px;
+  max-width: 1000px;
   margin: auto;
 }
 
@@ -122,21 +114,48 @@ h1, h2, h3 {
   color: #004080;
 }
 
-figure {
-  margin: 20px 0;
-  text-align: center;
-}
-
-figure img {
-  max-width: 100%;
+/* ===========================
+   CMS Table Styling
+   =========================== */
+#cms-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 25px;
+  background: #fff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  overflow: hidden;
 }
 
-figcaption {
-  font-size: 0.9em;
-  color: #555;
-  margin-top: 5px;
+#cms-table th {
+  background-color: #004080;
+  color: white;
+  padding: 12px;
+  text-align: left;
+  font-size: 1rem;
+}
+
+#cms-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  vertical-align: top;
+}
+
+#cms-table tr:nth-child(even) {
+  background-color: #f4f4f9;
+}
+
+#cms-table tr:hover {
+  background-color: #e8f0ff;
+}
+
+#cms-table a {
+  color: #004080;
+  font-weight: bold;
+}
+
+#cms-table a:hover {
+  text-decoration: underline;
 }
 
 /* ===========================
@@ -168,8 +187,6 @@ footer {
 /* ===========================
    Responsive Mobile Styles
    =========================== */
-
-/* Menu toggle hidden on large screens */
 .menu-toggle {
   display: none;
   font-size: 1.2rem;
@@ -180,24 +197,19 @@ footer {
   cursor: pointer;
 }
 
-/* Mobile Layout */
 @media (max-width: 768px) {
-
-  /* Show menu button */
   .menu-toggle {
     display: block;
     width: 100%;
     text-align: left;
   }
 
-  /* Hide nav links initially */
   .nav-links {
     display: none;
     flex-direction: column;
     background-color: #004080;
   }
 
-  /* Show when active */
   .nav-links.active {
     display: flex;
   }
@@ -216,20 +228,11 @@ footer {
     border: none;
   }
 
-  nav ul li:hover ul {
-    visibility: visible;
-    opacity: 1;
-  }
-
-  .hero {
-    height: auto;
-  }
-
-  .hero img {
-    height: auto;
-  }
-
   .hero-text h1 {
     font-size: 1.8em;
+  }
+
+  #cms-table td, #cms-table th {
+    font-size: 0.9rem;
   }
 }
