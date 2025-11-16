@@ -1,0 +1,85 @@
+[
+  {
+    "Name": "WordPress",
+    "Support": "Open Source, Supported by Most Hosting Companies",
+    "Technology": "PHP, MySQL, JavaScript",
+    "Capabilities": [
+      "Supports themes",
+      "Supports plugins",
+      "Public REST API",
+      "Large community and documentation"
+    ],
+    "Limitations": [
+      "Frequent security vulnerabilities if plugins are outdated",
+      "Performance can slow without optimization",
+      "Requires ongoing maintenance"
+    ],
+    "Example": "https://wordpress.org/"
+  },
+  {
+    "Name": "Joomla",
+    "Support": "Open Source, Community Supported",
+    "Technology": "PHP, MySQL",
+    "Capabilities": [
+      "More advanced user access controls",
+      "Flexible content management",
+      "Supports extensions and templates"
+    ],
+    "Limitations": [
+      "Steeper learning curve than WordPress",
+      "Fewer plugins and themes",
+      "Requires technical skill for customization"
+    ],
+    "Example": "https://www.joomla.org/"
+  },
+  {
+    "Name": "Drupal",
+    "Support": "Open Source, Strong Developer Community",
+    "Technology": "PHP, MySQL/PostgreSQL",
+    "Capabilities": [
+      "Extremely customizable",
+      "Strong security",
+      "Ideal for enterprise-level and government sites"
+    ],
+    "Limitations": [
+      "Not beginner friendly",
+      "Requires developer knowledge",
+      "Themes and modules often require coding"
+    ],
+    "Example": "https://www.drupal.org/"
+  },
+  {
+    "Name": "Wix",
+    "Support": "Commercial – Wix.com",
+    "Technology": "Cloud-based, JavaScript, Wix Velo Framework",
+    "Capabilities": [
+      "Drag-and-drop interface",
+      "Hosting included",
+      "App Market for add-ons",
+      "No coding required"
+    ],
+    "Limitations": [
+      "Limited customization for advanced users",
+      "Cannot export site easily",
+      "Less scalable for large enterprise use"
+    ],
+    "Example": "https://www.wix.com/"
+  },
+  {
+    "Name": "Squarespace",
+    "Support": "Commercial – Squarespace Inc.",
+    "Technology": "Cloud-based, JavaScript, CSS, JSON Template Engine",
+    "Capabilities": [
+      "Beautiful template designs",
+      "Built‑in e‑commerce",
+      "Hosting and security included",
+      "No coding required"
+    ],
+    "Limitations": [
+      "Less flexible than open-source CMS",
+      "Limited third‑party integration",
+      "Not ideal for complex custom apps"
+    ],
+    "Example": "https://www.squarespace.com/"
+  }
+]
