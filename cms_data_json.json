@@ -1,85 +1,85 @@
 [
   {
-    "Name": "WordPress",
-    "Support": "Open Source, Supported by Most Hosting Companies",
-    "Technology": "PHP, MySQL, JavaScript",
-    "Capabilities": [
+    "name": "WordPress",
+    "support": "Open Source, Supported by Most Hosting Companies",
+    "technology": "PHP, MySQL, JavaScript",
+    "capabilities": [
       "Supports themes",
       "Supports plugins",
       "Public REST API",
       "Large community and documentation"
     ],
-    "Limitations": [
+    "limitations": [
       "Frequent security vulnerabilities if plugins are outdated",
       "Performance can slow without optimization",
       "Requires ongoing maintenance"
     ],
-    "Example": "https://wordpress.org/"
+    "example": "https://wordpress.org/"
   },
   {
-    "Name": "Joomla",
-    "Support": "Open Source, Community Supported",
-    "Technology": "PHP, MySQL",
-    "Capabilities": [
+    "name": "Joomla",
+    "support": "Open Source, Community Supported",
+    "technology": "PHP, MySQL",
+    "capabilities": [
       "More advanced user access controls",
       "Flexible content management",
       "Supports extensions and templates"
     ],
-    "Limitations": [
+    "limitations": [
       "Steeper learning curve than WordPress",
       "Fewer plugins and themes",
       "Requires technical skill for customization"
     ],
-    "Example": "https://www.joomla.org/"
+    "example": "https://www.joomla.org/"
   },
   {
-    "Name": "Drupal",
-    "Support": "Open Source, Strong Developer Community",
-    "Technology": "PHP, MySQL/PostgreSQL",
-    "Capabilities": [
+    "name": "Drupal",
+    "support": "Open Source, Strong Developer Community",
+    "technology": "PHP, MySQL/PostgreSQL",
+    "capabilities": [
       "Extremely customizable",
       "Strong security",
       "Ideal for enterprise-level and government sites"
     ],
-    "Limitations": [
+    "limitations": [
       "Not beginner friendly",
       "Requires developer knowledge",
       "Themes and modules often require coding"
     ],
-    "Example": "https://www.drupal.org/"
+    "example": "https://www.drupal.org/"
   },
   {
-    "Name": "Wix",
-    "Support": "Commercial – Wix.com",
-    "Technology": "Cloud-based, JavaScript, Wix Velo Framework",
-    "Capabilities": [
+    "name": "Wix",
+    "support": "Commercial – Wix.com",
+    "technology": "Cloud-based, JavaScript, Wix Velo Framework",
+    "capabilities": [
       "Drag-and-drop interface",
       "Hosting included",
       "App Market for add-ons",
       "No coding required"
     ],
-    "Limitations": [
+    "limitations": [
       "Limited customization for advanced users",
       "Cannot export site easily",
       "Less scalable for large enterprise use"
     ],
-    "Example": "https://www.wix.com/"
+    "example": "https://www.wix.com/"
   },
   {
-    "Name": "Squarespace",
-    "Support": "Commercial – Squarespace Inc.",
-    "Technology": "Cloud-based, JavaScript, CSS, JSON Template Engine",
-    "Capabilities": [
+    "name": "Squarespace",
+    "support": "Commercial – Squarespace Inc.",
+    "technology": "Cloud-based, JavaScript, CSS, JSON Template Engine",
+    "capabilities": [
       "Beautiful template designs",
-      "Built‑in e‑commerce",
+      "Built-in e-commerce",
       "Hosting and security included",
       "No coding required"
     ],
-    "Limitations": [
+    "limitations": [
       "Less flexible than open-source CMS",
-      "Limited third‑party integration",
+      "Limited third-party integration",
       "Not ideal for complex custom apps"
     ],
-    "Example": "https://www.squarespace.com/"
+    "example": "https://www.squarespace.com/"
   }
 ]
