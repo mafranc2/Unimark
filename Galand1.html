@@ -1,0 +1,486 @@
+<!-- Paste into JSFiddle (HTML panel) or save as index.html -->
+<div id="menu">
+  <h1>Galactica Ultra</h1>
+  <p>Select Difficulty:</p>
+  <button id="easyBtn">Easy</button>
+  <button id="normalBtn">Normal</button>
+  <button id="hardBtn">Hard</button>
+</div>
+
+<div id="gameArea" style="display:none;">
+  <canvas id="gameCanvas" width="600" height="700"></canvas>
+</div>
+
+<style>
+  body { margin:0; background:black; overflow:hidden; font-family:Arial; color:white; }
+  #menu { text-align:center; margin-top:120px; }
+  button { padding:10px 20px; margin:10px; font-size:18px; cursor:pointer; }
+  #gameArea { display:flex; justify-content:center; margin-top:10px; }
+  canvas { background:black; border:2px solid #444; box-shadow:0 0 20px #0ff; image-rendering: pixelated; }
+  .overlay {
+    position:absolute; left:0; top:0; width:100%; height:100%; display:flex;
+    align-items:center; justify-content:center; pointer-events:none;
+  }
+</style>
+
+<script>
+window.addEventListener('load', () => {
+
+  /********************** PIXEL SPRITE GENERATOR (SNES-Style) **********************/
+  // draw a pixel-map (2D array of color indices) onto a small canvas and scale it up
+  function createPixelSprite(pixels, palette, scale=4){
+    const w = pixels[0].length;
+    const h = pixels.length;
+    const c = document.createElement('canvas');
+    c.width = w * scale;
+    c.height = h * scale;
+    const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    for(let y=0;y<h;y++){
+      for(let x=0;x<w;x++){
+        const colIndex = pixels[y][x];
+        if(colIndex === null) continue;
+        ctx.fillStyle = palette[colIndex];
+        ctx.fillRect(x*scale, y*scale, scale, scale);
+      }
+    }
+    return c;
+  }
+
+  // palettes (SNES-y)
+  const palettePlayer = ['#000000', '#00FFFF', '#006060', '#FFFFFF', '#FFD600', '#202020'];
+  const paletteEnemy  = ['#000000', '#FF66FF', '#990066', '#FFFFFF', '#660033'];
+  const paletteMini   = ['#000000', '#FFAA33', '#663300', '#FFFFFF'];
+  const paletteBoss   = ['#000000', '#FF88FF', '#770044', '#FFDDFF', '#442244', '#FFFFFF'];
+  const paletteExplosion = ['#000000','#FFB400','#FF3D00','#FFFFFF','#FF6A00'];
+
+  // Example 11x11 player sprite (centered ship, SNES-like)
+  const playerPixels1 = [
+    [null,null,null,0,0,1,0,0,null,null,null],
+    [null,null,0,0,1,1,1,0,0,null,null],
+    [null,0,0,0,1,1,1,0,0,0,null],
+    [0,0,0,1,1,1,1,1,0,0,0],
+    [0,0,1,1,1,1,1,1,1,0,0],
+    [0,1,1,1,1,1,1,1,1,1,0],
+    [0,0,1,1,1,1,1,1,1,0,0],
+    [null,0,0,1,1,1,1,1,0,0,null],
+    [null,null,0,0,1,1,1,0,0,null,null],
+    [null,null,null,0,0,1,0,0,null,null,null],
+    [null,null,null,null,0,0,null,null,null,null,null]
+  ];
+  // alternate frame (thruster flicker)
+  const playerPixels2 = [
+    [null,null,null,0,0,1,0,0,null,null,null],
+    [null,null,0,0,1,1,1,0,0,null,null],
+    [null,0,0,0,1,1,1,0,0,0,null],
+    [0,0,0,1,1,1,1,1,0,0,0],
+    [0,0,1,1,1,1,1,1,1,0,0],
+    [0,1,1,1,3,1,1,1,1,1,0], // small white flare center
+    [0,0,1,1,1,1,1,1,1,0,0],
+    [null,0,0,1,1,1,1,1,0,0,null],
+    [null,null,0,0,1,1,1,0,0,null,null],
+    [null,null,null,0,0,1,0,0,null,null,null],
+    [null,null,null,null,0,0,null,null,null,null,null]
+  ];
+
+  // enemy fighter 10x8 (simple SNES blocky)
+  const enemyPixels1 = [
+    [null,0,0,0,0,0,0,0,0,null],
+    [0,0,0,1,1,1,1,0,0,0],
+    [0,0,1,1,1,1,1,1,0,0],
+    [0,1,1,2,1,1,2,1,1,0],
+    [0,1,1,2,2,2,2,1,1,0],
+    [0,0,1,1,1,1,1,1,0,0],
+    [null,0,0,1,1,1,1,0,0,null],
+    [null,null,0,0,1,1,0,0,null,null]
+  ];
+  const enemyPixels2 = enemyPixels1.map(row => row.slice()); // could tweak for wing flap, keep simple
+
+  // mini-boss 12x8
+  const miniPixels = [
+    [null,0,0,0,0,0,0,0,0,0,null,null],
+    [0,0,1,1,1,1,1,1,1,1,0,0],
+    [0,1,1,2,1,1,1,1,2,1,1,0],
+    [1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,1,3,1,1,4,4,1,1,3,1,1],
+    [0,1,1,1,1,1,1,1,1,1,1,0],
+    [null,0,1,1,1,1,1,1,1,1,0,null],
+    [null,null,0,0,1,1,1,1,0,0,null,null]
+  ];
+
+  // boss (large) 28x14
+  const bossPixels = [
+    // top decorative ridge
+    [null,null,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,null,null],
+    [null,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,null],
+    [0,1,1,2,2,2,2,3,3,2,2,2,2,2,2,2,3,3,2,2,2,2,2,2,1,1,0],
+    [0,1,2,2,2,2,3,3,4,4,4,4,4,4,4,4,4,3,3,2,2,2,2,2,2,1,0],
+    [0,1,2,3,3,4,4,4,4,4,4,5,5,4,4,4,4,4,4,3,3,2,2,2,1,1,0],
+    [0,1,2,3,4,4,4,4,4,4,4,5,5,4,4,4,4,4,4,4,3,3,2,2,1,1,0],
+    [0,1,2,3,4,4,4,4,4,4,4,5,5,4,4,4,4,4,4,4,4,3,3,2,1,1,0],
+    [null,0,1,2,3,3,4,4,4,4,4,5,5,4,4,4,4,4,4,4,3,3,2,1,0,null,null],
+    [null,null,0,1,1,2,3,3,3,3,3,4,4,3,3,3,3,3,3,3,2,1,0,null,null,null],
+    [null,null,null,0,0,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,0,0,null,null,null,null],
+    [null,null,null,null,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,null,null,null,null,null,null],
+    [null,null,null,null,null,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,null,null,null,null,null,null,null],
+    // extra blank rows if needed
+  ];
+
+  // make explosion frames: a few small circular pixel patterns
+  const explosionFramesPixels = [
+    [
+      [null,null,0,0,0,null],
+      [null,0,1,1,0,null],
+      [0,1,2,2,1,0],
+      [0,1,2,2,1,0],
+      [null,0,1,1,0,null],
+      [null,null,0,0,0,null]
+    ],
+    [
+      [null,0,1,1,0,null],
+      [0,1,2,2,1,0],
+      [1,2,3,3,2,1],
+      [1,2,3,3,2,1],
+      [0,1,2,2,1,0],
+      [null,0,1,1,0,null]
+    ],
+    [
+      [0,1,2,2,1,0],
+      [1,2,3,3,2,1],
+      [2,3,4,4,3,2],
+      [2,3,4,4,3,2],
+      [1,2,3,3,2,1],
+      [0,1,2,2,1,0]
+    ]
+  ];
+
+  // create sprite canvases (scale chosen to look SNES-y)
+  const playerSpriteA = createPixelSprite(playerPixels1, palettePlayer, 4);
+  const playerSpriteB = createPixelSprite(playerPixels2, palettePlayer, 4);
+  const enemySpriteA  = createPixelSprite(enemyPixels1, paletteEnemy, 3);
+  const enemySpriteB  = createPixelSprite(enemyPixels2, paletteEnemy, 3);
+  const miniSprite    = createPixelSprite(miniPixels, paletteMini, 3);
+  const bossSprite    = createPixelSprite(bossPixels, paletteBoss, 2);
+  const explosionFrames = explosionFramesPixels.map(fr => createPixelSprite(fr, paletteExplosion, 6));
+
+  /********************** SIMPLE SFX (WebAudio) **********************/
+  const AudioCtx = window.AudioContext||window.webkitAudioContext;
+  const audioCtx = new AudioCtx();
+  function beep(freq,dur,type='square'){const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.frequency.value=freq;o.type=type;g.gain.value=.12;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur);}
+  const sndPlayerShoot=()=>beep(600,.06);
+  const sndEnemyShoot=()=>beep(220,.08,'sawtooth');
+  const sndHit=()=>beep(160,.09,'triangle');
+  const sndExplosion=()=>beep(100,.25);
+  const sndPickup=()=>beep(900,.07,'sine');
+
+  /********************** DIFFICULTY SETTINGS **********************/
+  let DIFF={waveCount:6, enemyHP:200, miniHP:100, enemyRate:60, enemySpeed:2};
+
+  // hook up buttons
+  const easyBtn = document.getElementById('easyBtn');
+  const normalBtn = document.getElementById('normalBtn');
+  const hardBtn = document.getElementById('hardBtn');
+
+  easyBtn.addEventListener('click', ()=>startGame('easy'));
+  normalBtn.addEventListener('click', ()=>startGame('normal'));
+  hardBtn.addEventListener('click', ()=>startGame('hard'));
+
+  function startGame(d){
+    if(d==='easy') DIFF={waveCount:4,enemyHP:180,miniHP:80,enemyRate:75,enemySpeed:1.5};
+    if(d==='normal')DIFF={waveCount:6,enemyHP:200,miniHP:100,enemyRate:60,enemySpeed:2};
+    if(d==='hard') DIFF={waveCount:8,enemyHP:250,miniHP:130,enemyRate:45,enemySpeed:3};
+    const menu = document.getElementById('menu');
+    const gameArea = document.getElementById('gameArea');
+    if(menu) menu.style.display='none';
+    if(gameArea) gameArea.style.display='flex';
+    init(); gameLoop();
+  }
+
+  /********************** GAME VARIABLES **********************/
+  let canvas, ctx;
+  let player;
+  let bullets, enemyBullets;
+  let waves, currentWave;
+  let miniBosses;
+  let boss;
+  let pickups;
+  let bombs=[];
+  let shieldActive=false;
+  let shieldTime=0;
+  let gameRunning = false;
+  let explosions = [];
+  let lastEnemyFire = 0;
+  let frameCount = 0;
+  let showWin = false;
+
+  /********************** INIT **********************/
+  function init(){
+    canvas=document.getElementById('gameCanvas');
+    if(!canvas) { console.error('Game canvas not found'); return; }
+    ctx=canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+
+    player = { x:280, y:620, w:44, h:44, speed:5, health:100, rapid:false, animFrame:0 };
+    bullets=[]; enemyBullets=[]; pickups=[]; miniBosses=[]; bombs=[]; explosions=[];
+
+    waves=createWaves(DIFF.waveCount);
+    currentWave=0;
+
+    boss=createBoss();
+    gameRunning = true;
+    showWin = false;
+    frameCount = 0;
+  }
+
+  /********************** WAVES **********************/
+  function createWaves(n){
+    let arr=[];
+    for(let w=0;w<n;w++){
+      let wave=[];
+      for(let i=0;i<6;i++) wave.push({x:30+i*90,y:-(w*220)-50,w:40,h:30,dy:2,hp:40,anim:Math.random()*10});
+      arr.push(wave);
+    }
+    return arr;
+  }
+
+  /********************** BOSSES **********************/
+  function createBoss(){
+    return {
+      x:200, y:20, w:bossSprite.width*1.2, h:bossSprite.height*1.2,
+      health:DIFF.enemyHP, dir:1, fireCooldown:120, phase:0, alive:true, frame:0
+    };
+  }
+
+  /********************** INPUT **********************/
+  let keys={};
+  document.addEventListener('keydown',e=>{ keys[e.key]=true; if(e.key===' '||e.key==='Space') e.preventDefault(); });
+  document.addEventListener('keyup',e=>{ keys[e.key]=false; });
+
+  function shoot(){
+    if(!gameRunning) return;
+    if(player.rapid){ for(let i=0;i<2;i++){ bullets.push({x:player.x+18+i*8,y:player.y-6,w:4,h:12,dy:-10}); }}
+    else bullets.push({x:player.x+18,y:player.y-6,w:4,h:12,dy:-8});
+    sndPlayerShoot();
+  }
+
+  function dropBomb(){ bombs.push({x:player.x+10,y:player.y,w:20,h:20,frame:0}); sndExplosion(); }
+
+  /********************** EXPLOSIONS **********************/
+  function spawnExplosion(x,y){
+    explosions.push({x:x-12,y:y-12,frame:0,life:explosionFrames.length});
+    sndExplosion();
+  }
+  function drawExplosion(b){ ctx.drawImage(explosionFrames[Math.floor(b.frame)], b.x, b.y); b.frame+=0.35; }
+
+  /********************** UPDATE **********************/
+  function update(){
+    if(!gameRunning) return;
+    frameCount++;
+
+    if(keys['ArrowLeft']&&player.x>0)player.x-=player.speed;
+    if(keys['ArrowRight']&&player.x+player.w<600)player.x+=player.speed;
+    if(keys[' ']||keys['Space']) shoot();
+    if(keys['b']||keys['B']) { if(bombs.length<2) dropBomb(); }
+
+    // player animation frame
+    player.animFrame = (Math.floor(frameCount/6) % 2);
+
+    /********* SHIELD TIMER *********/
+    if(shieldActive){ shieldTime--; if(shieldTime<=0)shieldActive=false; }
+
+    /********* PLAYER BULLETS *********/
+    bullets.forEach(b=>b.y+=b.dy);
+    bullets=bullets.filter(b=>b.y>-20 && !b.dead);
+
+    /******** WAVES BEFORE BOSS ********/
+    if(currentWave < waves.length){
+      let wave = waves[currentWave];
+      wave.forEach((e,i)=>{ e.y += e.dy + Math.sin((frameCount+e.anim)/30)*0.3; });
+      // bullet collisions
+      wave.forEach(enemy=>{
+        bullets.forEach(b=>{
+          if(rect(enemy,b)){ enemy.hp = (enemy.hp||40) - 10; b.dead=true; sndHit(); if((enemy.hp||40)<=0){ spawnExplosion(enemy.x,enemy.y); sndExplosion(); } }
+        });
+      });
+      wave = wave.filter(e=> (e.hp === undefined || e.hp>0) && e.y<700 );
+      waves[currentWave]=wave;
+      if(wave.length===0) currentWave++;
+    }
+
+    /******** MINI BOSSES ********/
+    if(Math.random()<0.01 && currentWave>=waves.length)
+      miniBosses.push({x:Math.random()*520,y:-60,w:miniSprite.width,h:miniSprite.height,dy:2,hp:DIFF.miniHP,fire:60});
+
+    miniBosses.forEach(m=>{
+      m.y+=m.dy; m.fire--;
+      bullets.forEach(b=>{ if(rect(m,b)){ m.hp-=10; b.dead=true; sndHit(); if(m.hp<=0){ spawnExplosion(m.x,m.y); sndExplosion(); } } });
+      if(m.fire<=0){ enemyFire(m); m.fire = 60 + Math.floor(Math.random()*60); }
+    });
+    miniBosses=miniBosses.filter(m=>m.hp>0 && m.y<700);
+
+    bullets=bullets.filter(b=>!b.dead);
+
+    /******** ENEMY FIRE (random small enemies) ********/
+    if(frameCount % Math.max(20, DIFF.enemyRate) === 0 && currentWave < waves.length){
+      const wave = waves[currentWave];
+      if(wave && wave.length>0){
+        const shooter = wave[Math.floor(Math.random()*wave.length)];
+        enemyFire(shooter);
+      }
+    }
+
+    enemyBullets.forEach(b=>{b.x+=b.dx || 0; b.y+=b.dy || 0;});
+    enemyBullets=enemyBullets.filter(b=>b.y<800 && !b.dead);
+
+    /******** ENEMY HITS PLAYER ********/
+    enemyBullets.forEach(b=>{ if(rect(player,b) && !shieldActive){ player.health-=10; b.dead=true; sndHit(); }} );
+    enemyBullets=enemyBullets.filter(b=>!b.dead);
+
+    /******** PICKUPS ********/
+    if(Math.random()<0.005) pickups.push({x:Math.random()*560,y:-20,w:30,h:30,dy:2,type:randomPickup()});
+    pickups.forEach(p=>{ p.y+=p.dy; if(rect(player,p)){ applyPickup(p.type); p.dead=true; sndPickup(); }});
+    pickups=pickups.filter(p=>!p.dead);
+
+    /******** BOMBS ********/
+    bombs.forEach(b=>b.frame+=0.4);
+    bombs=bombs.filter(b=>b.frame<explosionFrames.length);
+
+    /******** EXPLOSIONS ********/
+    explosions.forEach(e=>{ if(e.frame >= e.life) e.dead = true; });
+    explosions = explosions.filter(e=>!e.dead);
+
+    /******** BOSS BEHAVIOR ********/
+    if(currentWave >= waves.length && boss.alive){
+      // boss enters screen
+      if(boss.y < 40) boss.y += 1.5;
+      else {
+        // lateral movement
+        boss.x += boss.dir * (DIFF.enemySpeed*0.6);
+        if(boss.x < 10 || boss.x + boss.w > 600-10) boss.dir *= -1;
+        // periodic fire
+        boss.fireCooldown--;
+        if(boss.fireCooldown <= 0){
+          // multiple shots in spread
+          for(let i=-2;i<=2;i++){
+            enemyBullets.push({ x: boss.x + boss.w/2, y: boss.y + boss.h - 10, w:8, h:12, dx:i*1.5, dy:3 });
+          }
+          sndEnemyShoot();
+          boss.fireCooldown = 90 - Math.min(60, Math.floor((DIFF.enemySpeed)*10));
+        }
+        // boss takes hits from bullets
+        bullets.forEach(b=>{ if(rect(boss,b)){ boss.health-=10; b.dead=true; sndHit(); if(boss.health<=0){ boss.alive=false; spawnExplosion(boss.x + boss.w/2, boss.y + boss.h/2); sndExplosion(); } } });
+      }
+    }
+
+    // check boss defeat -> win
+    if(boss.alive === false && !showWin){
+      showWin = true;
+      gameRunning = false;
+      setTimeout(()=>{ alert('YOU WIN! — Refresh to play again'); }, 150);
+    }
+
+    // simple game-over
+    if(player.health <= 0 && gameRunning){ gameRunning = false; setTimeout(()=>{ alert('Game Over — press F5 to restart'); }, 50); }
+  }
+
+  /********************** PICKUPS **********************/
+  function randomPickup(){return ['shield','rapid','heal'][Math.floor(Math.random()*3)];}
+  function applyPickup(t){
+    if(t==='shield'){shieldActive=true; shieldTime=300;}
+    if(t==='rapid'){player.rapid=true; setTimeout(()=>player.rapid=false,5000);}
+    if(t==='heal'){player.health=Math.min(100,player.health+30);}
+  }
+
+  /********************** COLLISION **********************/
+  function rect(a,b){ return a && b && a.x < b.x + b.w && a.x + (a.w||20) > b.x && a.y < b.y + b.h && a.y + (a.h||20) > b.y; }
+
+  /********************** ENEMY FIRE (example for boss and mini) **********************/
+  function enemyFire(ship){
+    const spread = (ship.w || 40) / 8;
+    const angle = (Math.random()*40-20)*(Math.PI/180);
+    enemyBullets.push({ x:ship.x + (ship.w||40)/2, y:ship.y + (ship.h||20), w:8,h:12, dx:Math.sin(angle)*3, dy:Math.cos(angle)*3+2 });
+    sndEnemyShoot();
+  }
+
+  /********************** RENDER **********************/
+  function render(){
+    if(!ctx) return;
+    ctx.clearRect(0,0,600,700);
+    // soft scanline background for SNES feel
+    ctx.fillStyle='rgba(0,8,20,0.4)'; ctx.fillRect(0,0,600,700);
+    for(let y=0;y<700;y+=4){ ctx.fillStyle='rgba(255,255,255,0.002)'; ctx.fillRect(0,y,600,1); }
+
+    // Player (pixel-sprite with two-frame animation)
+    const pSprite = (player.animFrame === 0) ? playerSpriteA : playerSpriteB;
+    ctx.drawImage(pSprite, player.x, player.y, player.w, player.h);
+    if(shieldActive){ ctx.strokeStyle='rgba(0,255,255,0.6)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(player.x+player.w/2,player.y+player.h/2,36,0,Math.PI*2); ctx.stroke(); }
+
+    // Waves (small enemies)
+    if(currentWave < waves.length) waves[currentWave].forEach(e=>{
+      const es = (Math.floor(frameCount/12)%2===0) ? enemySpriteA : enemySpriteB;
+      ctx.drawImage(es, e.x, e.y, e.w, e.h);
+    });
+
+    // Mini-bosses
+    miniBosses.forEach(m=>{ ctx.drawImage(miniSprite, m.x, m.y, m.w, m.h); });
+
+    // Boss (appears after waves)
+    if(currentWave >= waves.length && boss.alive){
+      ctx.drawImage(bossSprite, boss.x, boss.y, boss.w, boss.h);
+      // boss health bar (big at top)
+      drawBossHP(80, 18, 440, 18, boss.health, DIFF.enemyHP);
+    }
+
+    // Bullets
+    ctx.fillStyle='white'; bullets.forEach(b=>ctx.fillRect(b.x,b.y,b.w,b.h));
+    ctx.fillStyle='red'; enemyBullets.forEach(b=>ctx.fillRect(b.x,b.y,b.w,b.h));
+
+    // Pickups
+    pickups.forEach(p=>{ ctx.fillStyle = ({shield:'cyan',rapid:'yellow',heal:'lime'})[p.type] || 'white'; ctx.fillRect(p.x,p.y,p.w,p.h); });
+
+    // Bombs/explosions
+    bombs.forEach(b=>drawExplosion(b));
+    explosions.forEach(e=>drawExplosion(e));
+
+    // Player HP
+    drawHP(20,660,200,15,player.health);
+
+    // Boss label
+    if(currentWave >= waves.length && boss.alive){
+      ctx.fillStyle = 'white';
+      ctx.font = '14px Arial';
+      ctx.fillText('BOSS', 520, 30);
+    }
+
+    // WIN overlay - drawn if showWin true
+    if(showWin){
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillRect(0,0,600,700);
+      ctx.fillStyle = 'white';
+      ctx.font = '48px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('YOU WIN!', 300, 340);
+      ctx.font = '18px Arial';
+      ctx.fillText('Thanks for playing — refresh to play again', 300, 380);
+      ctx.textAlign = 'left';
+    }
+  }
+
+  function drawHP(x,y,w,h,p){
+    ctx.strokeStyle='white'; ctx.lineWidth=1; ctx.strokeRect(x,y,w,h);
+    ctx.fillStyle=p>60?'lime':p>30?'yellow':'red'; ctx.fillRect(x,y,(p/100)*w,h);
+  }
+  function drawBossHP(x,y,w,h,current,max){
+    ctx.strokeStyle='white'; ctx.strokeRect(x,y,w,h);
+    const pct = Math.max(0, current) / max;
+    ctx.fillStyle = pct > 0.6 ? '#66FF66' : pct > 0.3 ? '#FFFF66' : '#FF6666';
+    ctx.fillRect(x,y,Math.floor(w * pct),h);
+    ctx.fillStyle='white'; ctx.font='12px Arial'; ctx.fillText(`BOSS HP: ${Math.max(0,current)}/${max}`, x+8, y+13);
+  }
+
+  /********************** GAME LOOP **********************/
+  function gameLoop(){ update(); render(); if(gameRunning) requestAnimationFrame(gameLoop); }
+
+}); // end window.load
+</script>
+
